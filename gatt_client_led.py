@@ -1,6 +1,7 @@
 #!/usr/bin/python3
 import asyncio
 import tkinter as tk
+import threading
 from bleak import BleakClient, BleakScanner
 
 # UUIDs à faire correspondre avec le serveur
@@ -29,23 +30,30 @@ class BLEClientGUI:
     def start_scan(self):
         print("start_scan(self):")
         self.status_label.config(text="🔍 Scan en cours...")
-        asyncio.run(self.scan_and_connect())
+        #asyncio.run(self.scan_and_connect())
+        threading.Thread(target=lambda: asyncio.run(self.scan_and_connect()), daemon=True).start()
 
     async def scan_and_connect(self):
-        devices = await BleakScanner.discover()
+        devices = await BleakScanner.discover(timeout = 15.0)
+        print(f"devices == {devices}")
         for d in devices:
+            print(f"Adresse == {d.address}")
             try:
                 async with BleakClient(d.address) as client:
                     services = await client.get_services()
+                    print(f"Services == {services}")
                     if SERVICE_UUID in [s.uuid for s in services]:
                         self.client = client
                         self.device = d
-                        self.status_label.config(text=f"✅ Connecté à {d.name} ({d.address})")
-                        self.led_button.config(state="normal")
+                        #self.status_label.config(text=f"✅ Connecté à {d.name} ({d.address})")
+                        #self.led_button.config(state="normal")
+                        self.root.after(0, lambda: self.status_label.config(text=f"✅ Connecté à {d.name} ({d.address})"))
+                        self.root.after(0, lambda: self.led_button.config(state="normal"))
                         return
             except Exception as e:
                 continue
-        self.status_label.config(text="❌ Aucun serveur trouvé.")
+        #self.status_label.config(text="❌ Aucun serveur trouvé.")
+        self.root.after(0, lambda: self.status_label.config(text="❌ Aucun serveur trouvé."))
 
     def toggle_led(self):
         if self.client is None:
