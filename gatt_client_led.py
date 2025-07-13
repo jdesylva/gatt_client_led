@@ -55,10 +55,11 @@ class BLEClientGUI:
 
                 client = BleakClient(d.address)
                 await client.connect()
-                #services = await client.get_services()
-                services = client.services
-                print(f"Services == {services}")
-                if SERVICE_UUID in [s.uuid for s in services]:
+                print(f"Connexion : {client.is_connected}")
+                print(f"Services == {client.services}")
+                for service in client.services:
+                    print(f"    {service.uuid}")
+                if SERVICE_UUID in [s.uuid for s in client.services]:
                     self.client = client
                     self.device = d
                     self.root.after(0, lambda: self.status_label.config(text=f"✅ Connecté à {d.name} ({d.address})"))
@@ -69,6 +70,8 @@ class BLEClientGUI:
 
 
             except Exception as e:
+                print("Exception!!!")
+                print(e)
                 continue
         #self.status_label.config(text="❌ Aucun serveur trouvé.")
         self.root.after(0, lambda: self.status_label.config(text="❌ Aucun serveur trouvé."))
