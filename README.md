@@ -6,26 +6,25 @@ Ce dépôt contient un simple client BLE GATT avec une interface Tkinter. Il rec
 
 Assurez-vous que Python 3 est installé, puis installez la bibliothèque BLE :
 
-```bash
 pip install bleak
 
 Tkinter est généralement fourni avec Python, mais sur les systèmes basés sur Debian, il peut être nécessaire d’exécuter sudo apt-get install python3-tk.
 
-#Permissions
+# Permissions
 L’accès aux périphériques BLE nécessite souvent des privilèges élevés sous Linux. Vous pouvez soit lancer le programme avec sudo, soit attribuer les capacités nécessaires à l’interpréteur Python :
 
 sudo setcap cap_net_raw,cap_net_admin+eip $(readlink -f $(which python3))
 
 Après cela, vous pouvez exécuter le script en tant qu’utilisateur normal.
 
-#Lancer le serveur
+# Lancer le serveur
 Démarrez un serveur BLE implémentant les mêmes UUID. Si vous utilisez l’exemple complémentaire gatt_server_led.py, exécutez-le d’abord sur la machine ou le microcontrôleur contrôlant la LED :
 
 python3 gatt_server_led.py
 
 Assurez-vous que le serveur est en mode publicité et détectable.
 
-#Lancer le client
+# Lancer le client
 Une fois le serveur actif, lancez le client :
 
 python3 gatt_client_led.py
